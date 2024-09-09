@@ -54,6 +54,7 @@ def register_task(clickup_api_key, task_url, start, end):
         st.stop()
 
     start_time_in_milliseconds = start.timestamp() * 1000
+    end_time_in_milliseconds = end.timestamp() * 1000
 
     duration = calculate_task_duration(
         start,
@@ -69,17 +70,36 @@ def register_task(clickup_api_key, task_url, start, end):
         "Authorization": clickup_api_key,
         "Content-Type": "application/json",
     }
-    url = f"https://api.clickup.com/api/v2/team/{team_id}/time_entries"
-    query = {
-        "custom_task_ids": "true",
-        "team_id": team_id,
-    }
+    url = (
+        f"https://api.clickup.com/api/v2/task/{task_id}/time"
+        if team_id is None
+        else f"https://api.clickup.com/api/v2/team/{team_id}/time_entries"
+    )
 
-    data = {
-        "tid": task_id,
-        "duration": duration,
-        "start": start_time_in_milliseconds,
-    }
+    query = (
+        {
+            "custom_task_ids": "false",
+        }
+        if team_id is None
+        else {
+            "custom_task_ids": "true",
+            "team_id": team_id,
+        }
+    )
+
+    data = (
+        {
+            "start": start_time_in_milliseconds,
+            "end": end_time_in_milliseconds,
+            "time": duration,
+        }
+        if team_id is None
+        else {
+            "tid": task_id,
+            "duration": duration,
+            "start": start_time_in_milliseconds,
+        }
+    )
 
     response = requests.post(url, headers=headers, json=data, params=query)
     status_code = response.status_code
