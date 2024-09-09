@@ -167,8 +167,8 @@ def main():
             end_date = st.session_state.end_date
             end_time = st.session_state.end_time
 
-            start = datetime.datetime.combine(start_date, start_time)
-            end = datetime.datetime.combine(end_date, end_time)
+            start = datetime.combine(start_date, start_time)
+            end = datetime.combine(end_date, end_time)
 
             response = register_task(
                 clickup_api_key,
